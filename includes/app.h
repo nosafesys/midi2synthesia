@@ -19,4 +19,9 @@ typedef struct App
     bool key_active[NOTE_COUNT];
 } App;
 
+bool app_init(App *a);
+bool app_free(App *a);
+bool app_device_input(App *a);
+bool app_file_input(App *a);
+
 #endif

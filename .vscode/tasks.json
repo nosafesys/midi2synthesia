@@ -7,12 +7,11 @@
       "command": "gcc",
       "args": [
         "src/main.c",
-        "src/init.c",
+        "src/app.c",
         "src/input.c",
         "src/note.c",
         "src/render.c",
         "src/midi.c",
-        "src/cleanup.c",
         "-Iincludes",
         "-I/usr/local/include/SDL3",
         "-I/usr/local/include",     
