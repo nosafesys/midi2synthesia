@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "portmidi.h": "c",
+        "stdio.h": "c",
+        "typeinfo": "c",
+        "stdlib.h": "c",
+        "midi.h": "c",
+        "sdl.h": "c",
+        "synthesia.h": "c",
+        "sdl3_gfxprimitives.h": "c",
+        "cleanup.h": "c",
+        "functional": "c",
+        "main.h": "c",
+        "app.h": "c",
+        "note.h": "c"
+    }
+}

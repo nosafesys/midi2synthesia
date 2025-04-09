@@ -1,0 +1,39 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build MIDI2Synthesia",
+      "type": "shell",
+      "command": "gcc",
+      "args": [
+        "src/main.c",
+        "src/init.c",
+        "src/input.c",
+        "src/note.c",
+        "src/render.c",
+        "src/midi.c",
+        "src/cleanup.c",
+        "-Iincludes",
+        "-I/usr/local/include/SDL3",
+        "-I/usr/local/include",     
+        "-D_REENTRANT",             
+        "-L/usr/local/lib",
+        "-o", "build/midi2synthesia",
+        "-lSDL3",
+        "-lSDL3_gfx",
+        "-lSDL3_ttf",        
+        "-lportmidi",
+        "-g"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"],
+      "detail": "Builds the MIDI2Synthesia project using SDL3, SDL3_gfx, and SDL3_ttf"
+    }
+  ]
+}
