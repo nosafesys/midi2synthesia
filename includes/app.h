@@ -7,16 +7,17 @@
 
 typedef struct App
 {
+    bool running;
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Event event;
-    bool running;
-    int note_count;
+    smf_t *smf;
     int device_count;
     DeviceInfo *devices;
     PortMidiStream *stream;
     Note notes[MAX_NOTES];
     bool key_active[NOTE_COUNT];
+    int note_count;
 } App;
 
 bool app_init(App *a);

@@ -4,25 +4,10 @@
     {
       "label": "Build MIDI2Synthesia",
       "type": "shell",
-      "command": "gcc",
+      "command": "bash",
       "args": [
-        "src/main.c",
-        "src/app.c",
-        "src/input.c",
-        "src/note.c",
-        "src/render.c",
-        "src/midi.c",
-        "-Iincludes",
-        "-I/usr/local/include/SDL3",
-        "-I/usr/local/include",     
-        "-D_REENTRANT",             
-        "-L/usr/local/lib",
-        "-o", "build/midi2synthesia",
-        "-lSDL3",
-        "-lSDL3_gfx",
-        "-lSDL3_ttf",        
-        "-lportmidi",
-        "-g"
+        "-c",
+        "gcc src/main.c src/app.c src/input.c src/note.c src/render.c src/midi.c -Iincludes -I/usr/local/include/SDL3 -I/usr/local/include -D_REENTRANT -L/usr/local/lib -o build/midi2synthesia -lSDL3 -lSDL3_gfx -lSDL3_ttf -lportmidi -l:libsmf.a -g $(pkg-config --cflags --libs glib-2.0)"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -32,7 +17,7 @@
         "isDefault": true
       },
       "problemMatcher": ["$gcc"],
-      "detail": "Builds the MIDI2Synthesia project using SDL3, SDL3_gfx, and SDL3_ttf"
+      "detail": "Builds the MIDI2Synthesia project using SDL3, libsmf, and glib"
     }
   ]
 }

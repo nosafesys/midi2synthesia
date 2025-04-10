@@ -3,7 +3,7 @@
 #include "midi.h"
 #include "input.h"
 
-int main()
+int main(int argc, char *argv[])
 {
     App app;
 
