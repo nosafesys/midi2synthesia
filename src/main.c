@@ -11,9 +11,9 @@ int main(int argc, char *argv[])
 
     app_init(&app);
 
-    midi_load_file(&app, "data/example_songs/bohemain-rhapsody.mid");
+    // midi_load_file(&app, "data/example_songs/bohemain-rhapsody.mid");
 
-    // app_device_input(&app);
+    app_device_input(&app);
 
     app_free(&app);
 
