@@ -7,7 +7,7 @@
       "command": "bash",
       "args": [
         "-c",
-        "gcc src/main.c src/app.c src/input.c src/note.c src/render.c src/midi.c -Iincludes -I/usr/local/include/SDL3 -I/usr/local/include -D_REENTRANT -L/usr/local/lib -o build/midi2synthesia -lSDL3 -lSDL3_gfx -lSDL3_ttf -lportmidi -l:libsmf.a -g $(pkg-config --cflags --libs glib-2.0)"
+        "gcc src/main.c src/app.c src/input.c src/note.c src/render.c src/midi.c -Iincludes -I/usr/local/include/SDL3 -I/usr/local/include -D_REENTRANT -L/usr/local/lib -o build/midi2synthesia -lSDL3 -lSDL3_gfx -lSDL3_ttf -lportmidi -l:libsmf.a -g $(pkg-config --cflags --libs glib-2.0) -lm"
       ],
       "options": {
         "cwd": "${workspaceFolder}"

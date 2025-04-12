@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <smf.h>
+#include <math.h>
 
 #define SCREEN_WIDTH_LARGE 1920
 #define SCREEN_HEIGHT_LARGE 1080

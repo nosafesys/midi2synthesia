@@ -13,6 +13,7 @@ typedef struct
 bool midi_device_count(App *a);
 bool midi_device_info(App *a, int device_count);
 bool midi_open_stream(App *a, int device_id);
+bool midi_load_file(App *a, const char *filename);
 void midi_poll_events(App *a);
 
 #endif

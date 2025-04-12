@@ -57,6 +57,42 @@ bool midi_open_stream(App *a, int device_id)
     }
 }
 
+bool midi_load_file(App *a, const char *filename)
+{
+    smf_event_t *event;
+    char *event_text;
+
+    a->smf_song = smf_load(filename);
+    if (a->smf_song == NULL)
+    {
+        fprintf(stderr, "Error: Failed to load MIDI file\n");
+        return false;
+    }
+
+    while ((event = smf_get_next_event(a->smf_song)) != NULL)
+    {
+        if (smf_event_is_metadata(event))
+            continue;
+
+        uint8_t *buffer = event->midi_buffer;
+        uint8_t status = buffer[0];
+        uint8_t data = buffer[1];
+
+        if (status == 0x90)
+        {
+            a->events[a->event_count] = event;
+            a->event_count++;
+        }
+        else if (status == 0x80)
+        {
+            a->event_count++;
+        }
+    }
+
+    smf_delete(a->smf_song);
+    return true;
+}
+
 void midi_poll_events(App *a)
 {
     if (Pm_Poll(a->stream))
