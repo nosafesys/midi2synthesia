@@ -10,6 +10,7 @@ typedef struct App
     bool running;
     SDL_Window *window;
     SDL_Renderer *renderer;
+    SDL_Surface *icon;
     SDL_Event sdl_evt;
     smf_t *song;
     smf_event_t **smf_evts;

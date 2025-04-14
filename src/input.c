@@ -57,6 +57,8 @@ void input_loop_d(App *a)
         }
         a->note_c = j;
     }
+
+    free(a->notes);
 }
 
 void input_loop_f(App *a)
