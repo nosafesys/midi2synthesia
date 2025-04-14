@@ -13,28 +13,28 @@ bool note_is_white(int note)
     return pc == 0 || pc == 2 || pc == 4 || pc == 5 || pc == 7 || pc == 9 || pc == 11;
 }
 
-int note_white_index(int midi_note)
+int note_white_index(int md_note)
 {
-    int index = 0;
-    for (int i = MIDI_NOTE_MIN; i < midi_note; i++)
+    int idx = 0;
+    for (int i = MIDI_NOTE_MIN; i < md_note; i++)
     {
         if (note_is_white(i))
         {
-            index++;
+            idx++;
         }
     }
-    return index;
+    return idx;
 }
 
-int note_black_index(int midi_note)
+int note_black_index(int md_note)
 {
-    int index = 0;
-    for (int i = MIDI_NOTE_MIN; i < midi_note; i++)
+    int idx = 0;
+    for (int i = MIDI_NOTE_MIN; i < md_note; i++)
     {
         if (note_is_black(i))
         {
-            index++;
+            idx++;
         }
     }
-    return index;
+    return idx;
 }

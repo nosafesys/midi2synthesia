@@ -3,19 +3,26 @@
 #include "midi.h"
 #include "input.h"
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
-    App app = {0};
+    App a = {0};
 
-    app.running = true;
+    a.running = true;
 
-    app_init(&app);
+    if (!app_init(&a))
+    {
+        fprintf(stderr, "Initialization error");
+        return -1;
+    }
 
-    // midi_load_file(&app, "data/example_songs/bohemain-rhapsody.mid");
+    app_file_input(&a, "data/example_songs/chopin-etude-op10-no4.mid");
+    // app_device_input(&a);
 
-    app_device_input(&app);
-
-    app_free(&app);
+    if (!app_free(&a))
+    {
+        fprintf(stderr, "Cleanup error");
+        return -1;
+    }
 
     return 0;
 }

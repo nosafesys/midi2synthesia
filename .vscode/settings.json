@@ -12,6 +12,14 @@
         "functional": "c",
         "main.h": "c",
         "app.h": "c",
-        "note.h": "c"
+        "note.h": "c",
+        "variant": "c",
+        "smf.h": "c"
+    },
+    "github.copilot.enable": {
+        "*": false,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false
     }
 }

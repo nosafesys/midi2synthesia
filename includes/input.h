@@ -3,5 +3,6 @@
 
 #include "main.h"
 
-void main_input_loop(App *a);
+void input_loop_d(App *a);
+void input_loop_f(App *a);
 #endif

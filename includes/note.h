@@ -5,13 +5,17 @@
 
 typedef struct
 {
-    int midi_note;
-    int index;
-    bool active;
+    int md_note;
+    int idx;
+    bool on;
     bool black;
+    bool marked;
+    double start_t;
+    double end_t;
     int y;
-    int height;
-    int velocity;
+    int h;
+    int vel;
+
 } Note;
 
 bool note_is_black(int midi_note);

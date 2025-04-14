@@ -1,53 +1,62 @@
 #include "midi.h"
 #include "app.h"
 
+static int compare_notes(const void *a, const void *b)
+{
+    const Note *note_a = (const Note *)a;
+    const Note *note_b = (const Note *)b;
+
+    if (note_a->start_t < note_b->start_t)
+        return -1;
+    if (note_a->start_t > note_b->start_t)
+        return 1;
+    return 0;
+}
+
 bool midi_device_count(App *a)
 {
-    int device_count = Pm_CountDevices();
-    if (device_count <= 0)
+    int dev_c = Pm_CountDevices();
+    if (dev_c <= 0)
     {
-        fprintf(stderr, "Error: No MIDI input devices found");
         return false;
     }
     else
     {
-        a->device_count = device_count;
+        a->dev_c = dev_c;
     }
 
     return true;
 }
 
-bool midi_device_info(App *a, int device_count)
+bool midi_device_info(App *a, int dev_c)
 {
 
-    DeviceInfo *devices = (DeviceInfo *)malloc(device_count * sizeof(DeviceInfo));
+    DeviceInfo *devs = (DeviceInfo *)malloc(dev_c * sizeof(DeviceInfo));
 
-    if (devices == NULL)
+    if (devs == NULL)
     {
-        fprintf(stderr, "Error: Unable to allocate memory for device data");
         return false;
     }
 
-    for (int i = 0; i < device_count; i++)
+    for (int i = 0; i < dev_c; i++)
     {
-        const PmDeviceInfo *pminfo = Pm_GetDeviceInfo(i);
+        const PmDeviceInfo *pm_inf = Pm_GetDeviceInfo(i);
 
-        devices[i].name = pminfo->name;
-        devices[i].input_support = pminfo->input;
+        devs[i].name = pm_inf->name;
+        devs[i].inp = pm_inf->input;
     }
 
-    a->devices = devices;
-    a->device_count = device_count;
+    a->devs = devs;
+    a->dev_c = dev_c;
 
     return true;
 }
 
-bool midi_open_stream(App *a, int device_id)
+bool midi_open_stream(App *a, int dev_id)
 {
     PortMidiStream *stream;
-    if (Pm_OpenInput(&stream, device_id, NULL, 512, NULL, NULL) != pmNoError)
+    if (Pm_OpenInput(&stream, dev_id, NULL, 512, NULL, NULL) != pmNoError)
     {
-        fprintf(stderr, "Error: Failed to open MIDI stream\n");
         return false;
     }
     else
@@ -57,59 +66,52 @@ bool midi_open_stream(App *a, int device_id)
     }
 }
 
-bool midi_load_file(App *a, const char *filename)
+bool midi_load_file(App *a, char *file)
 {
-    smf_event_t *event;
+    smf_event_t *smf_evt;
 
-    a->smf_song = smf_load(filename);
-    if (a->smf_song == NULL)
+    a->song = smf_load(file);
+    if (a->song == NULL)
     {
-        fprintf(stderr, "Error: Failed to load MIDI file\n");
         return false;
     }
 
-    while ((event = smf_get_next_event(a->smf_song)) != NULL)
+    while ((smf_evt = smf_get_next_event(a->song)) != NULL)
     {
-        if (smf_event_is_metadata(event))
+        if (smf_event_is_metadata(smf_evt))
             continue;
 
-        unsigned char *buffer = event->midi_buffer;
-        uint8_t status = buffer[0];
-        uint8_t data = buffer[1];
+        uint8_t *buf = smf_evt->midi_buffer;
+        uint8_t stat = buf[0];
 
-        if (status == 0x90)
+        if (((stat & 0xF0) == 0x90 && (stat & 0x0F) == 0) ||
+            ((stat & 0xF0) == 0x80 && (stat & 0x0F) == 0))
         {
-            a->event_count++;
-        }
-        else if (status == 0x80)
-        {
-            a->event_count++;
+            a->evt_c++;
         }
     }
 
-    printf("Event count: %d\n", a->event_count);
+    a->smf_evts = (smf_event_t **)malloc(a->evt_c * sizeof(smf_event_t *));
 
-    a->events = (smf_event_t **)malloc(a->event_count * sizeof(smf_event_t *));
+    smf_rewind(a->song);
 
-    smf_rewind(a->smf_song);
-
-    int index = 0;
-    while ((event = smf_get_next_event(a->smf_song)) != NULL)
+    int idx = 0;
+    while ((smf_evt = smf_get_next_event(a->song)) != NULL)
     {
-        if (smf_event_is_metadata(event))
+        if (smf_event_is_metadata(smf_evt))
             continue;
 
-        unsigned char *buffer = event->midi_buffer;
-        uint8_t status = buffer[0];
+        uint8_t *buf = smf_evt->midi_buffer;
+        uint8_t stat = buf[0];
 
-        if (status == 0x90 || status == 0x80)
+        if (((stat & 0xF0) == 0x90 && (stat & 0x0F) == 0) || // Add checks for note offs that are note on w/vel 0
+            ((stat & 0xF0) == 0x80 && (stat & 0x0F) == 0))
         {
-            a->events[index] = event;
-            index++;
+            a->smf_evts[idx] = smf_evt;
+            idx++;
         }
     }
 
-    smf_delete(a->smf_song);
     return true;
 }
 
@@ -117,44 +119,98 @@ void midi_poll_events(App *a)
 {
     if (Pm_Poll(a->stream))
     {
-        PmEvent buffer[MAX_MIDI_EVENTS];
-        int count = Pm_Read(a->stream, buffer, MAX_MIDI_EVENTS);
+        PmEvent buf[MAX_MIDI_EVENTS];
+        int count = Pm_Read(a->stream, buf, MAX_MIDI_EVENTS);
         for (int i = 0; i < count; i++)
         {
-            int status = Pm_MessageStatus(buffer[i].message);
-            int midi_note = Pm_MessageData1(buffer[i].message);
-            int velocity = Pm_MessageData2(buffer[i].message);
+            int st = Pm_MessageStatus(buf[i].message);
+            int md_note = Pm_MessageData1(buf[i].message);
+            int vel = Pm_MessageData2(buf[i].message);
 
-            if ((status & 0xF0) == 0x90 && velocity > 0)
+            if ((st & 0xF0) == 0x90 && vel > 0)
             {
-                if (a->note_count < MAX_NOTES)
+                if (a->note_c < MAX_NOTES)
                 {
                     Note note;
-                    note.active = true;
-                    note.velocity = velocity;
+                    note.on = true;
+                    note.vel = vel;
                     note.y = SCREEN_HEIGHT_LARGE - WHITE_KEY_HEIGHT;
-                    note.black = note_is_black(midi_note);
-                    note.height = MIN_NOTE_HEIGHT;
-                    note.index = note.black ? note_black_index(midi_note)
-                                            : note_white_index(midi_note);
-                    note.midi_note = midi_note;
+                    note.black = note_is_black(md_note);
+                    note.h = MIN_NOTE_HEIGHT;
+                    note.idx = note.black ? note_black_index(md_note)
+                                          : note_white_index(md_note);
+                    note.md_note = md_note;
 
-                    a->notes[a->note_count] = note;
-                    a->note_count++;
+                    a->notes[a->note_c] = note;
+                    a->note_c++;
                 }
-                a->key_active[midi_note] = true;
+                a->keys_on[md_note] = true;
             }
-            else if ((status & 0xF0) == 0x80 || (((status & 0xF0) == 0x90) && velocity == 0))
+            else if ((st & 0xF0) == 0x80 || (((st & 0xF0) == 0x90) && vel == 0))
             {
-                for (int j = 0; j < a->note_count; j++)
+                for (int j = 0; j < a->note_c; j++)
                 {
-                    if (a->notes[j].midi_note == midi_note && a->notes[j].active)
+                    if (a->notes[j].md_note == md_note && a->notes[j].on)
                     {
-                        a->notes[j].active = false;
+                        a->notes[j].on = false;
                     }
                 }
-                a->key_active[midi_note] = false;
+                a->keys_on[md_note] = false;
             }
         }
     }
+}
+
+void midi_get_notes(App *a)
+{
+    smf_event_t *smf_evt;
+    double note_on_times[128] = {0};
+    double notes_on[128] = {0};
+    a->note_c = 0;
+    a->notes = (Note *)malloc((a->evt_c / 2) * sizeof(Note));
+
+    for (int i = 0; i < a->evt_c; i++)
+    {
+        smf_evt = a->smf_evts[i];
+        uint8_t *buf = smf_evt->midi_buffer;
+        uint8_t stat = buf[0];
+        uint8_t md_note = buf[1];
+        uint8_t vel = buf[2];
+
+        if (((stat & 0xF0) == 0x90 && (stat & 0x0F) == 0))
+        {
+            note_on_times[md_note] = smf_evt->time_seconds;
+            notes_on[md_note] = true;
+        }
+        else if ((stat & 0xF0) == 0x80 && (stat & 0x0F) == 0)
+        {
+            if (!notes_on[md_note])
+            {
+                continue;
+            }
+
+            double start_t = note_on_times[md_note];
+            double end_t = smf_evt->time_seconds;
+            double dur = end_t - start_t;
+
+            Note note = {0};
+            note.md_note = md_note;
+            note.start_t = start_t;
+            note.end_t = end_t;
+            note.on = false;
+            note.h = MIN_NOTE_HEIGHT + (dur * 3);
+            note.y = -note.h - 2;
+            note.black = note_is_black(md_note);
+            note.idx = note.black
+                           ? note_black_index(md_note)
+                           : note_white_index(md_note);
+            note.vel = vel;
+
+            a->notes[a->note_c] = note;
+            notes_on[md_note] = false;
+            a->note_c++;
+        }
+    }
+
+    qsort(a->notes, a->note_c, sizeof(Note), compare_notes);
 }
