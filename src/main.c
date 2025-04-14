@@ -15,7 +15,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    app_file_input(&a, "data/example_songs/bohemain-rhapsody.mid");
+    app_file_input(&a, "data/example_songs/chopin-etude-op10-no4.mid");
     // app_device_input(&a);
 
     if (!app_free(&a))
