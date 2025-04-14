@@ -2,3 +2,5 @@
 
 # midi2synthesia
 A tool for converting midi input to synthesia-style piano visuals
+
+![midi2synthesia Logo](data/example.png)
