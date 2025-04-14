@@ -1,3 +1,8 @@
+/*
+ * MIDI processing definitions and declarations
+ * Includes structures and function prototypes for MIDI handling
+ */
+
 #ifndef MIDI_H
 #define MIDI_H
 

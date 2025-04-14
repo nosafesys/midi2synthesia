@@ -1,3 +1,8 @@
+/*
+ * Main application entry point definitions
+ * Includes function prototypes and constants for main.c
+ */
+
 #ifndef MAIN_H
 #define MAIN_H
 

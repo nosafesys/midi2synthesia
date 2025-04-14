@@ -1,3 +1,8 @@
+/*
+ * Rendering definitions and declarations
+ * Includes structures and function prototypes for graphical rendering
+ */
+
 #ifndef RENDER_H
 #define RENDER_H
 

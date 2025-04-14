@@ -1,3 +1,8 @@
+/*
+ * Input handling definitions and declarations
+ * Includes function prototypes for processing user input
+ */
+
 #ifndef INPUT_H
 #define INPUT_H
 

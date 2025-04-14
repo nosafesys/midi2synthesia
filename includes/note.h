@@ -1,3 +1,8 @@
+/*
+ * Note processing definitions and declarations
+ * Includes structures and function prototypes for musical notes
+ */
+
 #ifndef NOTE_H
 #define NOTE_H
 

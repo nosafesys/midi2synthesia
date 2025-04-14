@@ -1,3 +1,8 @@
+/*
+ * Application-specific definitions and declarations
+ * Includes structures, constants, and function prototypes
+ */
+
 #ifndef APP_H
 #define APP_H
 
