@@ -20,14 +20,14 @@ void render_white_notes(App *a)
             continue;
 
         // Calculate the x-coordinate for the note
-        int x = a->notes[i].idx * (WHITE_KEY_WIDTH + 2) + 25;
+        float x = a->notes[i].idx * (WHITE_KEY_WIDTH + 2) + 25;
 
         // Define the rectangle for the note
-        SDL_Rect rect = {x, a->notes[i].y, WHITE_KEY_WIDTH - 1, a->notes[i].h};
+        SDL_FRect rect = {x, a->notes[i].y, WHITE_KEY_WIDTH - 1, a->notes[i].h};
 
-        // Draw the note with rounded corners
-        roundedBoxRGBA(a->renderer, rect.x, rect.y, rect.x + rect.w, rect.y + rect.h,
-                       RADIUS, 0, 255, 100, 255);
+        // Draw the note
+        SDL_SetRenderDrawColor(a->renderer, 0, 255, 100, 255);
+        SDL_RenderFillRect(a->renderer, &rect);
     }
 }
 
@@ -44,15 +44,15 @@ void render_black_notes(App *a)
             continue;
 
         // Calculate the x-coordinate for the note
-        int shift_w_idx = note_white_index(a->notes[i].md_note) - 1;
-        int x = shift_w_idx * (WHITE_KEY_WIDTH + 2) + 25 + WHITE_KEY_WIDTH - (BLACK_KEY_WIDTH / 2);
+        float shift_w_idx = note_white_index(a->notes[i].md_note) - 1;
+        float x = shift_w_idx * (WHITE_KEY_WIDTH + 2) + 25 + WHITE_KEY_WIDTH - (BLACK_KEY_WIDTH / 2);
 
         // Define the rectangle for the note
-        SDL_Rect rect = {x, a->notes[i].y, BLACK_KEY_WIDTH, a->notes[i].h};
+        SDL_FRect rect = {x, a->notes[i].y, BLACK_KEY_WIDTH, a->notes[i].h};
 
-        // Draw the note with rounded corners
-        roundedBoxRGBA(a->renderer, rect.x, rect.y, rect.x + rect.w, rect.y + rect.h,
-                       RADIUS, 0, 120, 40, 255);
+        // Draw the note
+        SDL_SetRenderDrawColor(a->renderer, 0, 120, 40, 255);
+        SDL_RenderFillRect(a->renderer, &rect);
     }
 }
 

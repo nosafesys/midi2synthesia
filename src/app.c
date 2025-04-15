@@ -14,7 +14,7 @@
 bool app_init(App *a)
 {
     // Initialize SDL with video and events subsystems
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS) != 0)
+    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS))
     {
         fprintf(stderr, "SDL initialization failed: %s\n", SDL_GetError());
         return false;
@@ -35,7 +35,7 @@ bool app_init(App *a)
     }
 
     // Create the SDL renderer for rendering graphics
-    a->renderer = SDL_CreateRenderer(a->window, NULL, SDL_RENDERER_ACCELERATED);
+    a->renderer = SDL_CreateRenderer(a->window, NULL);
     if (!a->renderer)
     {
         fprintf(stderr, "Renderer creation failed: %s\n", SDL_GetError());
