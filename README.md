@@ -33,7 +33,7 @@ To build and run MIDI2Synthesia, you'll need the following dependencies:
 
 Clone the Repository
 
-`git clone https://github.com/nosafesys/midi2synthesia
+`git clone https://github.com/nosafesys/midi2synthesia &&
 cd midi2synthesia`
 
 Before building, make sure to install the required libraries. Here's an example using `apt` (Debian/Ubuntu-based systems):
