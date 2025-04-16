@@ -1,14 +1,9 @@
 ![midi2synthesia Logo](data/logo.png)
 
-# midi2synthesia
+# 🎹 MIDI2Synthesia
 A tool for converting midi input to synthesia-style piano visuals
 
 ![midi2synthesia Logo](data/example.png)
-
-
-# 🎹 MIDI2Synthesia
-
-**MIDI2Synthesia** is a C application for rendering MIDI files in a visual format suitable for Synthesia-style playback. It uses SDL3, libsmf, glib, and PortMIDI to bring musical notes to life on screen.
 
 ---
 
