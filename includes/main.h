@@ -17,6 +17,7 @@
 #include <smf.h>
 #include <math.h>
 #include <time.h>
+#include <fluidsynth.h>
 
 #define SCREEN_WIDTH_LARGE 1920
 #define SCREEN_HEIGHT_LARGE 1080

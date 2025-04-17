@@ -8,25 +8,22 @@
 #include "input.h"
 
 /*
- * Initialize the application structure and SDL systems
+ * Initialize SDL systems, PortMidi, fluidsynth
  * Returns true on success, false on failure
  */
 bool app_init(App *a)
 {
-    // Initialize SDL with video and events subsystems
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS))
     {
         fprintf(stderr, "SDL initialization failed: %s\n", SDL_GetError());
         return false;
     }
 
-    // Initialize SDL_ttf for font rendering
     if (!(TTF_Init()))
     {
         return false;
     }
 
-    // Create the SDL window with specified dimensions
     a->window = SDL_CreateWindow("midi2synthesia", SCREEN_WIDTH_SMALL, SCREEN_HEIGHT_SMALL, 0);
     if (!a->window)
     {
@@ -34,7 +31,6 @@ bool app_init(App *a)
         return false;
     }
 
-    // Create the SDL renderer for rendering graphics
     a->renderer = SDL_CreateRenderer(a->window, NULL);
     if (!a->renderer)
     {
@@ -42,9 +38,31 @@ bool app_init(App *a)
         return false;
     }
 
-    // Initialize PortMidi library
     PmError result = Pm_Initialize();
     if (result != pmNoError)
+    {
+        return false;
+    }
+
+    a->settings = new_fluid_settings();
+    if (a->settings == NULL)
+    {
+        return false;
+    }
+
+    a->synth = new_fluid_synth(a->settings);
+    if (a->synth == NULL)
+    {
+        return false;
+    }
+
+    if (fluid_synth_sfload(a->synth, "data/sounds/soundfont.sf2", 1))
+    {
+        return false;
+    }
+
+    a->adriver = new_fluid_audio_driver(a->settings, a->synth);
+    if (a->adriver == NULL)
     {
         return false;
     }
@@ -84,7 +102,7 @@ void app_device_input(App *a)
     // Retrieve information about MIDI devices
     midi_device_info(a, dev_c);
 
-    // Open a MIDI input stream for a specific device (hardcoded to device 3)
+    // Open a MIDI input stream for a specific device
     midi_open_stream(a, 3);
 
     // Enter the input loop for device-based MIDI playback
@@ -95,62 +113,56 @@ void app_device_input(App *a)
  * Free resources and clean up the application structure
  * Returns true on success, false on failure
  */
-bool app_free(App *a)
+void app_free(App *a)
 {
-    // Delete the loaded MIDI song
-    smf_delete(a->song);
-
-    PmError pm_res;
-    const char *sdl_res;
-
-    // Free allocated memory for device information
-    free(a->devs);
-
-    // Close the PortMidi stream
-    pm_res = Pm_Close(a->stream);
-    if (pm_res != pmNoError)
+    if (a->song)
     {
-        return false;
+        smf_delete(a->song);
     }
 
-    // Terminate the PortMidi library
-    pm_res = Pm_Terminate();
-    if (pm_res != pmNoError)
+    if (a->notes)
     {
-        return false;
+        free(a->notes);
     }
 
-    // Quit SDL_ttf library
+    if (a->devs)
+    {
+        free(a->devs);
+    }
+
+    if (a->adriver)
+    {
+        delete_fluid_audio_driver(a->adriver);
+    }
+
+    if (a->synth)
+    {
+        delete_fluid_synth(a->synth);
+    }
+
+    if (a->settings)
+    {
+        delete_fluid_settings(a->settings);
+    }
+
+    if (a->stream)
+    {
+        Pm_Close(a->stream);
+    }
+
+    Pm_Terminate();
+
     TTF_Quit();
-    sdl_res = SDL_GetError();
-    if (sdl_res && sdl_res[0] != '\0')
+
+    if (a->renderer)
     {
-        return false;
+        SDL_DestroyRenderer(a->renderer);
     }
 
-    // Destroy the SDL renderer
-    SDL_DestroyRenderer(a->renderer);
-    sdl_res = SDL_GetError();
-    if (sdl_res && sdl_res[0] != '\0')
+    if (a->window)
     {
-        return false;
+        SDL_DestroyWindow(a->window);
     }
 
-    // Destroy the SDL window
-    SDL_DestroyWindow(a->window);
-    sdl_res = SDL_GetError();
-    if (sdl_res && sdl_res[0] != '\0')
-    {
-        return false;
-    }
-
-    // Quit SDL subsystems
     SDL_Quit();
-    sdl_res = SDL_GetError();
-    if (sdl_res && sdl_res[0] != '\0')
-    {
-        return false;
-    }
-
-    return true;
 }

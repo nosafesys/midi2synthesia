@@ -34,18 +34,19 @@ void input_loop_d(App *a)
         // Update note positions and heights
         for (int i = 0; i < a->note_c; i++)
         {
-            if (a->notes[i].on)
+            Note *note = &a->notes[i];
+            if (note->on)
             {
-                a->notes[i].y -= 3;
-                a->notes[i].h += 3;
+                note->y -= 3;
+                note->h += 3;
             }
-            else if (a->notes[i].h > 0)
+            else if (note->h > 0)
             {
-                a->notes[i].y -= 3;
+                note->y -= 3;
 
-                if (a->notes[i].y + a->notes[i].h < 0)
+                if (note->y + note->h < 0)
                 {
-                    a->notes[i].h = 0;
+                    note->h = 0;
                 }
             }
         }
@@ -110,9 +111,10 @@ void input_loop_f(App *a)
         // Activate notes based on their start time
         while (note_idx < a->note_c)
         {
-            if (a->notes[note_idx].start_t <= current_time)
+            Note *note = &a->notes[note_idx];
+            if (note->start_t <= current_time)
             {
-                a->notes[note_idx].on = true;
+                note->on = true;
                 note_idx++;
             }
             else

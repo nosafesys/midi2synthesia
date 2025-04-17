@@ -17,6 +17,9 @@ typedef struct App
     SDL_Renderer *renderer;
     SDL_Surface *icon;
     SDL_Event sdl_evt;
+    fluid_settings_t *settings;
+    fluid_synth_t *synth;
+    fluid_audio_driver_t *adriver;
     smf_t *song;
     smf_event_t **smf_evts;
     int evt_c;
@@ -29,7 +32,7 @@ typedef struct App
 } App;
 
 bool app_init(App *a);
-bool app_free(App *a);
+void app_free(App *a);
 void app_device_input(App *a);
 void app_file_input(App *a, char *file);
 
